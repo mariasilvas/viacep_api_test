@@ -1,0 +1,160 @@
+{
+	"info": {
+		"_postman_id": "a82bbd1e-f6b6-4111-bc5a-01295ec51c24",
+		"name": "viacep",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consultar CEP",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "95f89d36-e338-461a-a2e7-969008fde5ee",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Is an object', () => pm.expect(pm.response.json()).to.be.an('object'));",
+							"",
+							"pm.test(\"Check response body\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.eql({",
+							"        \"cep\": \"49037-475\",",
+							"        \"logradouro\": \"Avenida Santos Dumont\",",
+							"        \"complemento\": \"até 1088/1089\",",
+							"        \"bairro\": \"Atalaia\",",
+							"        \"localidade\": \"Aracaju\",",
+							"        \"uf\": \"SE\",",
+							"        \"ibge\": \"2800308\",",
+							"        \"gia\": \"\",",
+							"        \"ddd\": \"79\",",
+							"        \"siafi\": \"3105\"",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "viacep.com.br/ws/:cep/json/",
+					"host": [
+						"viacep",
+						"com",
+						"br"
+					],
+					"path": [
+						"ws",
+						":cep",
+						"json",
+						""
+					],
+					"variable": [
+						{
+							"key": "cep",
+							"value": "49037475"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CEPs por Endereço",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c348e91e-dc15-4b05-88bf-ee6879bf170b",
+						"exec": [
+							"pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+							"",
+							"pm.test(\"Is an Array\", () => pm.expect(pm.response.json()).to.be.an('array').but.not.an('object'));",
+							"",
+							"pm.test(\"Contains all required keys\",",
+							"    () => pm.expect(pm.response.json()[0]).to.have.all.keys(",
+							"        'cep', 'logradouro', 'complemento', 'bairro', 'localidade', 'uf', 'ibge', 'gia', 'ddd', 'siafi'",
+							"    ))",
+							"",
+							"pm.test(\"Data type of the keys is string\", () => {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.forEach(row => {",
+							"        pm.expect(row.cep).to.be.a(\"string\");",
+							"        pm.expect(row.logradouro).to.be.a(\"string\");",
+							"        pm.expect(row.complemento).to.be.a(\"string\");",
+							"        pm.expect(row.bairro).to.be.a(\"string\");",
+							"        pm.expect(row.localidade).to.be.a(\"string\");",
+							"        pm.expect(row.uf).to.be.a(\"string\");",
+							"        pm.expect(row.ibge).to.be.a(\"string\");",
+							"        pm.expect(row.gia).to.be.a(\"string\");",
+							"        pm.expect(row.ddd).to.be.a(\"string\");",
+							"        pm.expect(row.siafi).to.be.a(\"string\");",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"Cep Length=9\", () => pm.expect(pm.response.json()[0].cep.length).to.eql(9));",
+							"",
+							"pm.test(\"Check DDD, Localidade and UF\", () => {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0].ddd).to.eql(\"79\");",
+							"    pm.expect(jsonData[0].localidade).to.eql(\"Aracaju\");",
+							"    pm.expect(jsonData[0].uf).to.eql(\"SE\");",
+							"});",
+							"",
+							"pm.test(\"Logradouro and Bairro are not empty\", () => {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0].bairro).not.to.be.empty;",
+							"    pm.expect(jsonData[0].logradouro).not.to.be.empty;",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "viacep.com.br/ws/:uf/:localidade/:endereço/json/",
+					"host": [
+						"viacep",
+						"com",
+						"br"
+					],
+					"path": [
+						"ws",
+						":uf",
+						":localidade",
+						":endereço",
+						"json",
+						""
+					],
+					"variable": [
+						{
+							"key": "uf",
+							"value": "SE"
+						},
+						{
+							"key": "localidade",
+							"value": "Aracaju"
+						},
+						{
+							"key": "endereço",
+							"value": "Dumont"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
